@@ -1,5 +1,10 @@
 import { useState } from "react";
 
+// ==================== GOOGLE FORM CONFIG ====================
+const GOOGLE_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSeYWIcVuyDj_z9SXKXkshra26WRO7n5zyYZVXJjDkGoPJTZOg/formResponse";
+const GOOGLE_FORM_ENTRY = "entry.1369534585";
+
+
 // ==================== TRANSLATIONS ====================
 const translations = {
   es: {
@@ -63,7 +68,28 @@ const detectLanguage = (): "es" | "en" => {
 // ==================== COMPONENT ====================
 const Index = () => {
   const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
   const t = translations[detectLanguage()];
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+
+    const formData = new FormData();
+    formData.append(GOOGLE_FORM_ENTRY, email);
+
+    try {
+      await fetch(GOOGLE_FORM_ACTION, {
+        method: "POST",
+        mode: "no-cors",  // Google Forms requiere esto
+        body: formData,
+      });
+      setStatus("success");
+      setEmail("");
+    } catch {
+      setStatus("error");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center px-4 py-12 sm:py-16">
@@ -115,19 +141,44 @@ const Index = () => {
         <p className="text-center font-heading font-semibold text-foreground mb-4 text-sm tracking-wide">
           {t.emailLabel}
         </p>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t.emailPlaceholder}
-            className="flex-1 bg-input border border-[hsl(var(--border))] text-foreground placeholder:text-[hsl(var(--text-faint))] rounded-lg px-4 py-3 font-body text-sm outline-none focus:ring-1 focus:ring-primary"
-          />
-          <button className="bg-primary text-primary-foreground font-heading font-bold text-sm px-6 py-3 rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap">
-            {t.emailButton}
-          </button>
-        </div>
+
+        {status === "success" ? (
+          // Mensaje de éxito
+          <div className="text-center border border-accent bg-[hsl(var(--accent)/0.08)] rounded-lg px-6 py-4">
+            <p className="text-accent font-heading font-bold text-sm">
+              {detectLanguage() === "es"
+                ? "✅ ¡Listo! Te avisaremos cuando estemos listos."
+                : "✅ Done! We'll notify you when we're ready."}
+            </p>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={t.emailPlaceholder}
+              required
+              className="flex-1 bg-input border border-[hsl(var(--border))] text-foreground placeholder:text-[hsl(var(--text-faint))] rounded-lg px-4 py-3 font-body text-sm outline-none focus:ring-1 focus:ring-primary"
+            />
+            <button
+              type="submit"
+              className="bg-primary text-primary-foreground font-heading font-bold text-sm px-6 py-3 rounded-lg hover:opacity-90 transition-opacity whitespace-nowrap"
+            >
+              {t.emailButton}
+            </button>
+          </form>
+        )}
+
+        {status === "error" && (
+          <p className="text-center text-red-400 text-xs mt-2">
+            {detectLanguage() === "es"
+              ? "Algo salió mal. Intenta de nuevo."
+              : "Something went wrong. Please try again."}
+          </p>
+        )}
       </div>
+
 
       {/* Product Callout */}
       <div className="w-full max-w-[600px] border border-accent bg-[hsl(var(--accent)/0.08)] rounded-lg p-5 mb-14 text-center">
