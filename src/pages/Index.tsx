@@ -54,7 +54,7 @@ const translations = {
   },
 };
 
-// ==================== LANGUAGE DETECTION ====================
+// ==================== LANGUAGE DETECTION ==================== // forzando commit
 const detectLanguage = (): "es" | "en" => {
   const browserLang = navigator.language.toLowerCase();
   return browserLang.startsWith("es") ? "es" : "en";
