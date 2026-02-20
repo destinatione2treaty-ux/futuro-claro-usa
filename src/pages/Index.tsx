@@ -199,9 +199,23 @@ const Index = () => {
       </p>
 
       {/* Copyright */}
-      <p className="text-center font-body text-xs text-[hsl(var(--text-faint))]">
-        {t.copyright}
-      </p>
+      <div className="text-center space-y-1">
+        <p className="font-body text-xs text-[hsl(var(--text-faint))]">
+          {t.copyright}
+        </p>
+        <p className="font-body text-xs text-[hsl(var(--text-faint))]">
+          {detectLanguage() === "es" ? "Desarrollado con ♥ por" : "Developed with ♥ by"}{" "}
+          <a
+            href="https://zenithwebcraft.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[hsl(var(--text-soft))] hover:text-accent transition-colors font-medium"
+          >
+            ZenithWebCraft
+          </a>
+        </p>
+      </div>
+
     </div>
   );
 };
